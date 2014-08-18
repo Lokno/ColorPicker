@@ -16,4 +16,4 @@ Select a color by either picking within the color space, or by using the color i
 
 - Intersecting point on circle does not match the position of the user clicks.
 
-[1] http://www.color-blindness.com/2009/01/19/colorblind-colors-of-confusion/
+  [1]: http://www.color-blindness.com/2009/01/19/colorblind-colors-of-confusion/
