@@ -215,10 +215,20 @@ function SetPoint(col) {
   ctx3.beginPath();
   ctx3.strokeStyle = '#ffffff';
   ctx3.fillStyle = col;
-  ctx3.beginPath();
   ctx3.arc(colorPoint.x*WIDTH3,(1-colorPoint.y)*HEIGHT3,3,0,2*Math.PI);
   ctx3.fill();        
   ctx3.stroke();  
+}
+
+function DrawGamutBorder()
+{
+  ctx3.beginPath();
+  ctx3.strokeStyle = "#ffffff";
+  ctx3.moveTo( red.x   * WIDTH3, (1.0-red.y )  * HEIGHT3 );
+  ctx3.lineTo( green.x * WIDTH3, (1.0-green.y) * HEIGHT3 );
+  ctx3.lineTo( blue.x  * WIDTH3, (1.0-blue.y)  * HEIGHT3 );
+  ctx3.lineTo( red.x   * WIDTH3, (1.0-red.y)   * HEIGHT3 );
+  ctx3.stroke();
 }
 
 function Init() {
@@ -233,6 +243,8 @@ function Init() {
   UpdateGradiate(hexToRGB("#ffffff"), "protan", id.data, HEIGHT3, WIDTH3, gradiateHeight);
   ctx3.putImageData(id,0,0);
   SetPoint("#ffffff");
+
+  DrawGamutBorder()
 }
 
 function hexToRGB(hex) {
@@ -285,7 +297,9 @@ function HandleColorPickingFromSpace(e) {
       ctx3.fillStyle = "#ff00ff";
       ctx3.beginPath();
       ctx3.arc(xy.x*WIDTH3,(1-xy.y)*HEIGHT3,3,0,2*Math.PI);
-      ctx3.fill();     
+      ctx3.fill(); 
+
+      DrawGamutBorder();    
   }
 }
 
@@ -299,6 +313,8 @@ function HandleColorPicking() {
   ctx3.putImageData(id,0,0);
 
   SetPoint(hexcol);
+
+  DrawGamutBorder();    
 }
 
 function Rot2D( v, angle )
