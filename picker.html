@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Smart Color Picker</title>
+    <title>Gradient Picker</title>
 
 <script type="text/javascript">
 
@@ -36,6 +36,13 @@ var rgbMat = [ 3.2410, -1.5374, -0.4986,
 var protanPoint = { x : 0.7635, y : 0.2365, z : 0};
 var deutanPoint = { x : 1.4,    y : -0.4,   z : 0};
 var tritanPoint = { x : 0.1748, y : 0.000,  z : 0};
+
+// White Point D65 0.31271, 0.32902, 1.0000
+
+// Y component of xyY color space primaries
+var rY = 0.2126;
+var gY = 0.7152;
+var bY = 0.0722;
 
 var red   = { x : 0.64, y : 0.33, z : 0 };
 var green = { x : 0.3,  y : 0.6,  z : 0 };
@@ -151,9 +158,34 @@ function XYZtoXY( src )
   return { x : tx, y : ty };
 }
 
+function XYtoBarycentric(x,y,a,b,c)
+{
+   var b1,b2,b3;
+
+   b1  = (b.y-c.y)*(  x-c.x) + (c.x-b.x)*(  y-c.y);
+   b1 /= (b.y-c.y)*(a.x-c.x) + (c.x-b.x)*(a.y-c.y);
+
+   b2  = (c.y-a.y)*(  x-c.x) + (a.x-c.x)*(  y-c.y);
+   b2 /= (b.y-c.y)*(a.x-c.x) + (c.x-b.x)*(a.y-c.y);
+
+   b3  = 1 - b1 - b2;
+
+   return { x : b1, y : b2, z : b3 };
+}
+
+function Dot(a,b)
+{
+    return a.x*b.x + a.y*b.y + a.z*b.z;
+}
+
+// calculates Y of CIE xyY to convert to CIE XYZ space
 function XYtoXYZ( x, y )
 {
-  dst = { r : x / y, g : 1, b : (1.0-x-y) / y };
+  B = XYtoBarycentric(x,y,red,green,blue);
+
+  Y = Dot( B, { x : rY, y : gY, z : bY } );
+
+  dst = { r : Y * x / y, g : Y, b : Y * (1.0-x-y) / y };
 
   return dst;
 }
@@ -181,10 +213,12 @@ function SetPoint(col) {
   ctx3.fill();
 
   ctx3.beginPath();
+  ctx3.strokeStyle = '#ffffff';
   ctx3.fillStyle = col;
   ctx3.beginPath();
   ctx3.arc(colorPoint.x*WIDTH3,(1-colorPoint.y)*HEIGHT3,3,0,2*Math.PI);
   ctx3.fill();        
+  ctx3.stroke();  
 }
 
 function Init() {
