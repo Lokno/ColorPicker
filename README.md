@@ -4,7 +4,7 @@ Experimental color picker which finds a gradient through the CIE 1931 color spac
 
 ## Usage ##
 
-View picker.html in a web browser. Select a type of color-blindness by the drop-down menu below the color space:
+View picker.html in a web browser. Select a type of color-blindness using the drop-down menu below the color space:
 
 - (Protan) protanopia (red-blindness)
 - (Deutan) deuteranopia (green-blindness)
