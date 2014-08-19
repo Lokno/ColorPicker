@@ -219,12 +219,24 @@ var radius = 0;
 function SetPoint(col) {
 
   // circle intersecting user selected point
+  ctx3.globalAlpha = 0.5;
   ctx3.beginPath();
-  ctx3.strokeStyle = col;
+  ctx3.strokeStyle = '#fff';
   ctx3.lineWidth = 2;
-  ctx3.beginPath();
   ctx3.arc(point.x*WIDTH3,(1-point.y)*HEIGHT3,radius,0,2*Math.PI);
-  ctx3.stroke();    
+  ctx3.stroke(); 
+
+  // ray from copuntal point into infinity
+  var ray = { x: (colorPoint.x - point.x) * 10 + point.x, y: (colorPoint.y - point.y) * 10 + point.y};
+
+  ctx3.beginPath();
+  ctx3.strokeStyle = '#fff';
+  ctx3.lineWidth = 2;
+  ctx3.moveTo(point.x*WIDTH3,(1-point.y)*HEIGHT3,5,0,2*Math.PI);
+  ctx3.lineTo(ray.x*WIDTH3,(1-ray.y)*HEIGHT3,5,0,2*Math.PI);
+  ctx3.stroke();  
+
+  ctx3.globalAlpha = 1.0; 
 
   // copuntal point
   ctx3.beginPath();
@@ -240,6 +252,7 @@ function SetPoint(col) {
   ctx3.arc(colorPoint.x*WIDTH3,(1-colorPoint.y)*HEIGHT3,3,0,2*Math.PI);
   ctx3.fill();        
   ctx3.stroke();  
+
 }
 
 function DrawD15()
