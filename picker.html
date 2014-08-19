@@ -199,19 +199,22 @@ var point = { x : 0, y : 0, z : 0 };
 var radius = 0;
 
 function SetPoint(col) {
-  // Draw Circle around point
+
+  // circle intersecting user selected point
   ctx3.beginPath();
   ctx3.strokeStyle = col;
   ctx3.beginPath();
   ctx3.arc(point.x*WIDTH3,(1-point.y)*HEIGHT3,radius,0,2*Math.PI);
   ctx3.stroke();    
 
+  // copuntal point
   ctx3.beginPath();
   ctx3.fillStyle = '#ffffff';
   ctx3.beginPath();
   ctx3.arc(point.x*WIDTH3,(1-point.y)*HEIGHT3,5,0,2*Math.PI);
   ctx3.fill();
 
+  // user selected point
   ctx3.beginPath();
   ctx3.strokeStyle = '#ffffff';
   ctx3.fillStyle = col;
@@ -292,12 +295,6 @@ function HandleColorPickingFromSpace(e) {
       ctx3.putImageData(id,0,0);
 
       SetPoint(hexcol);
-
-      ctx3.beginPath();
-      ctx3.fillStyle = "#ff00ff";
-      ctx3.beginPath();
-      ctx3.arc(xy.x*WIDTH3,(1-xy.y)*HEIGHT3,3,0,2*Math.PI);
-      ctx3.fill(); 
 
       DrawGamutBorder();    
   }
