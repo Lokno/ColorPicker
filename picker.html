@@ -41,6 +41,11 @@ var d15 = [ { r :  55/255.0, g : 129/255.0, b : 193/255.0 },
             { r : 143/255.0, g : 111/255.0, b : 164/255.0 },
             { r : 128/255.0, g : 115/255.0, b : 178/255.0 } ];
 
+var brewerSets = [[{r:166/255.0,g:206/255.0,b:227/255.0},{r:31/255.0,g:120/255.0,b:180/255.0},{r:178/255.0,g:223/255.0,b:138/255.0},{r:51/255.0,g:160/255.0,b:44/255.0}],
+                  [{r:27/255.0,g:158/255.0,b:119/255.0},{r:217/255.0,g:95/255.0,b:2/255.0},{r:117/255.0,g:112/255.0,b:179/255.0}],
+                  [{r:102/255.0,g:194/255.0,b:165/255.0},{r:252/255.0,g:141/255.0,b:98/255.0},{r:141/255.0,g:160/255.0,b:203/255.0}],
+                  [{r:141/255.0,g:211/255.0,b:199/255.0},{r:255/255.0,g:255/255.0,b:179/255.0},{r:190/255.0,g:186/255.0,b:218/255.0},{r:251/255.0,g:128/255.0,b:114/255.0},{r:128/255.0,g:177/255.0,b:211/255.0}]];
+
 var xyzMat = [ 0.4124, 0.3576, 0.1805,
                0.2126, 0.7152, 0.0722,
                0.0193, 0.1192, 0.9505 ];
@@ -255,30 +260,33 @@ function SetPoint(col) {
 
 }
 
-function DrawD15()
+function DrawColorPath(path, drawLine)
 {
-  ctx3.beginPath();
-  ctx3.strokeStyle = '#fff';
-  ctx3.lineWidth = 1;
 
-  var rgb = RGBtoSRGB(d15[0]);
-  var xyz = SRGBtoXYZ(rgb);
-  var xy = XYZtoXY(xyz);
-
-  ctx3.moveTo(xy.x * WIDTH3, (1.0-xy.y) * HEIGHT3);
-  for( var i = 1; i < 15; i++ )
+  if( drawLine )
   {
-    rgb = RGBtoSRGB(d15[i]);
-    xyz = SRGBtoXYZ(rgb);
-    xy = XYZtoXY(xyz);
-    ctx3.lineTo(xy.x * WIDTH3, (1.0-xy.y) * HEIGHT3);
+    ctx3.beginPath();
+    ctx3.strokeStyle = '#fff';
+    ctx3.lineWidth = 1;
+
+    var rgb = RGBtoSRGB(path[0]);
+    var xyz = SRGBtoXYZ(rgb);
+    var xy = XYZtoXY(xyz);
+
+    ctx3.moveTo(xy.x * WIDTH3, (1.0-xy.y) * HEIGHT3);
+    for( var i = 1; i < path.length; i++ )
+    {
+      rgb = RGBtoSRGB(path[i]);
+      xyz = SRGBtoXYZ(rgb);
+      xy = XYZtoXY(xyz);
+      ctx3.lineTo(xy.x * WIDTH3, (1.0-xy.y) * HEIGHT3);
+    }
+    ctx3.stroke();
   }
-  ctx3.stroke();  
 
-
-  for( var i = 0; i < 15; i++ )
+  for( var i = 0; i < path.length; i++ )
   {
-    rgb = RGBtoSRGB(d15[i]);
+    rgb = RGBtoSRGB(path[i]);
     xyz = SRGBtoXYZ(rgb);
     xy = XYZtoXY(xyz);
 
@@ -287,9 +295,16 @@ function DrawD15()
     ctx3.lineWidth = 1;
     ctx3.fillStyle = RGBtoHex(d15[i]);
     ctx3.arc(xy.x*WIDTH3,(1-xy.y)*HEIGHT3,2.5,0,2*Math.PI);
-    ctx3.fill();        
-    ctx3.stroke();    
+    ctx3.fill();  
+    ctx3.stroke();
   }   
+}
+
+function UpdateGeo(col)
+{
+  DrawGamutBorder();
+  SetPoint(col);
+  DrawColorPath(d15, true);
 }
 
 function DrawGamutBorder()
@@ -316,9 +331,7 @@ function Init() {
   UpdateGradiate(hexToRGB("#ffffff"), "protan", id.data, HEIGHT3, WIDTH3, gradiateHeight);
   ctx3.putImageData(id,0,0);
   
-  DrawGamutBorder();
-  SetPoint("#ffffff");
-  DrawD15();
+  UpdateGeo("#ffffff");  
 
   document.onselectstart = function() { return false; };
 }
@@ -367,9 +380,7 @@ function HandleColorPickingFromSpace(e) {
       UpdateGradiate(colorTemp, document.getElementById("selectType").value, id.data, HEIGHT3, WIDTH3, gradiateHeight);
       ctx3.putImageData(id,0,0);
 
-      DrawGamutBorder();    
-      SetPoint(hexcol);
-      DrawD15();
+      UpdateGeo(hexcol);  
   }
 }
 
@@ -382,9 +393,7 @@ function HandleColorPicking() {
   UpdateGradiate(hexToRGB(hexcol), document.getElementById("selectType").value, id.data, HEIGHT3, WIDTH3, gradiateHeight);
   ctx3.putImageData(id,0,0);
 
-  DrawGamutBorder();
-  SetPoint(hexcol);
-  DrawD15();    
+  UpdateGeo(hexcol);  
 }
 
 function Rot2D( v, angle )
