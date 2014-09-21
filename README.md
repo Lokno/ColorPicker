@@ -12,7 +12,9 @@ View picker.html in a web browser. Select a type of color-blindness using the dr
 
 Select a color by either picking within the color space, or by using the color input field to the right of the drop-down. The gradient appears just below the color space. The top half of the gradient is drawn as it would appear to a person with the color deficiency corresponding to the selected copunctal point. It corresponds to the circle intersecting with the chosen point and centered on the selected copunctal point.
 
-There are two straight white lines drawn over the color space. On is drawn from the copunctal point through the user selected color. The other line represents the major axis of the selected color deficiency. This axis is what color appears to collapse on for someone with that deficiency.
+There are two straight white lines drawn over the color space. One is drawn from the copunctal point through the user selected color. The other line represents the major axis of the selected color deficiency. This axis is what color appears to collapse on for someone with that deficiency.
+
+The ring of dots represent the 15 colors from the D-15 color test. Notice how the order of the colors in the loop would be lost once they collapse to the axis.
 
 ## Testing ##
 
