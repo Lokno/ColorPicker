@@ -2,7 +2,12 @@
 <html>
 <head>
     <title>Gradient Picker</title>
-
+<style>
+#description {
+  width: 480px;
+  padding: 10px;
+}
+</style>
 <script type="text/javascript">
 
 // Created by Jonathan Decker
@@ -22,6 +27,22 @@ var sw = 0;
 var sh = 0;
 
 var id = null;
+
+var colorMats = {'Normal':[1,0,0,
+                           0,1,0,
+                           0,0,1],
+// Red-Blind
+'Protanopia':   [0.567,0.433,0.000,
+                 0.558,0.442,0.000,
+                 0.000,0.242,0.758],
+// Green-Blind
+'Deuteranopia': [0.625,0.375,0.000,
+                 0.700,0.300,0.000,
+                 0.000,0.300,0.700],
+// Blue-Blind
+'Tritanopia':   [0.950,0.050,0.000,
+                 0.000,0.433,0.567,
+                 0.000,0.475,0.525]};
 
 var d15 = [ { r :  55/255.0, g : 129/255.0, b : 193/255.0 },
             { r :  53/255.0, g : 131/255.0, b : 180/255.0 },
@@ -50,15 +71,15 @@ var xyzMat = [ 0.4124, 0.3576, 0.1805,
                0.2126, 0.7152, 0.0722,
                0.0193, 0.1192, 0.9505 ];
 
-var rgbMat = [ 3.2410, -1.5374, -0.4986, 
-              -0.9692,  1.8760,  0.0416, 
-               0.0556, -0.2040,  1.0570 ];
+var rgbMat = [ 3.2406, -1.5372, -0.4986, 
+              -0.9689,  1.8758,  0.0415, 
+               0.0557, -0.2040,  1.0570 ];
 
 // copunctal points
 // http://www.color-blindness.com/2009/01/19/colorblind-colors-of-confusion/
-var protanPoint = { x : 0.7635, y : 0.2365, z : 0};
-var deutanPoint = { x : 1.4,    y : -0.4,   z : 0};
-var tritanPoint = { x : 0.1748, y : 0.000,  z : 0};
+var protanPoint = { x : 0.7635, y : 0.2365, z : 0, am : 1.273463, ab : -0.073894, name : 'Protanopia'};
+var deutanPoint = { x : 1.4,    y : -0.4,   z : 0, am : 0.968437, ab :  0.003331, name : 'Deuteranopia'};
+var tritanPoint = { x : 0.1748, y : 0.000,  z : 0, am : 0.062921, ab :  0.292119, name : 'Tritanopia'};
 
 // White Point D65 0.31271, 0.32902, 1.0000
 
@@ -70,6 +91,14 @@ var bY = 0.0722;
 var red   = { x : 0.64, y : 0.33, z : 0 };
 var green = { x : 0.3,  y : 0.6,  z : 0 };
 var blue  = { x : 0.15, y : 0.06, z : 0 };
+
+function transform( v, m ) {
+    t = { r : 0, g : 0, b : 0 };
+    t.r = v.r * m[0] + v.g * m[1] + v.b * m[2];
+    t.g = v.r * m[3] + v.g * m[4] + v.b * m[5];
+    t.b = v.r * m[6] + v.g * m[7] + v.b * m[8];
+    return t;
+}
 
 function clamp(x, min, max) {
   return Math.min(Math.max(x, min), max);
@@ -241,6 +270,14 @@ function SetPoint(col) {
   ctx3.lineTo(ray.x*WIDTH3,(1-ray.y)*HEIGHT3,5,0,2*Math.PI);
   ctx3.stroke();  
 
+  // major axis
+  ctx3.beginPath();
+  ctx3.strokeStyle = '#fff';
+  ctx3.lineWidth = 2;
+  ctx3.moveTo(0.0,(1-point.ab)*HEIGHT3,5,0,2*Math.PI);
+  ctx3.lineTo(WIDTH3,(1-(point.am+point.ab))*HEIGHT3,5,0,2*Math.PI);
+  ctx3.stroke();  
+
   ctx3.globalAlpha = 1.0; 
 
   // copuntal point
@@ -256,8 +293,7 @@ function SetPoint(col) {
   ctx3.fillStyle = col;
   ctx3.arc(colorPoint.x*WIDTH3,(1-colorPoint.y)*HEIGHT3,3,0,2*Math.PI);
   ctx3.fill();        
-  ctx3.stroke();  
-
+  ctx3.stroke();    
 }
 
 function DrawColorPath(path, drawLine)
@@ -500,9 +536,6 @@ function UpdateGradiate(col,cbType,data, yOffset, width, height) {
 
       angleTraversed += -delta
     }
-    
-    // once outside sRGB gamut, reverse list
-    colorPoints.reverse();
 
     colorPoint = xy;
 
@@ -523,7 +556,7 @@ function UpdateGradiate(col,cbType,data, yOffset, width, height) {
         colorTemp = XYtoXYZ(temp.x,temp.y);
         colorTemp = XYZtoSRGB(colorTemp);
         colorTemp = SRGBtoRGB(colorTemp);
-        colorPoints.push( colorTemp );
+        colorPoints.unshift( colorTemp );
       }
       
       ray = Rot2D(ray, delta);
@@ -532,6 +565,9 @@ function UpdateGradiate(col,cbType,data, yOffset, width, height) {
 
     // draw gradient
     var numPoints = colorPoints.length;
+
+    // get matrix 
+    var cm = colorMats[point.name];
 
     if( numPoints != 0 )
     {
@@ -545,10 +581,17 @@ function UpdateGradiate(col,cbType,data, yOffset, width, height) {
         if( pos == (width-1) ) tempColor = colorPoints[pos];
         else tempColor = Lerp(colorPoints[pos],colorPoints[pos],remainder);
 
-        for( var j = 0; j < height; ++j )
+        for( var j = 0; j < height/2; ++j )
         {
            SetPixel(data, i, yOffset+height-j, tempColor);
         }     
+
+        tempColor = transform(tempColor,cm)
+
+        for( var j = 0; j < height/2; ++j )
+        {
+           SetPixel(data, i, yOffset+height-j-height/2, tempColor);
+        }   
       }
     }
 }
@@ -556,6 +599,8 @@ function UpdateGradiate(col,cbType,data, yOffset, width, height) {
 </script>
 </head>
 <body onload="Init()">
+
+<a href="https://github.com/Lokno/ColorPicker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
 
 <div>
     <canvas id="canvas3" onclick="HandleColorPickingFromSpace(event)">
@@ -568,6 +613,14 @@ function UpdateGradiate(col,cbType,data, yOffset, width, height) {
     <option value="tritan">Tritan</option>
   </select>
     <input type="color" id="colorpicker" onchange="HandleColorPicking()" value="#ffffff"/>
+</div>
+
+<div id="description">
+<p>Experimental color picker which finds a gradient through the CIE XYZ color space which runs along the edge of a circle centered on a copunctal point and intersecting with a user selected color. The top half of the gradient is drawn as it would appear to a person with the color deficiency corresponding to the selected copunctal point.</p>
+
+<p>There are two straight white lines drawn over the color space. On is drawn from the copunctal point through the user selected color. The other line represents the major axis of the selected color deficiency. This axis is what color appears to collapse on for someone with that deficiency.</p>
+
+Copunctal point positions taken from <a href="http://www.color-blindness.com/2009/01/19/colorblind-colors-of-confusion/">this page</a>.
 </div>
 
 </body>
