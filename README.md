@@ -2,6 +2,8 @@
 
 Experimental color picker which finds a gradient through the CIE XYZ color space which runs along the edge of a circle centered on a copunctal point and intersecting with a user selected color. Copunctal point positions taken from [this page] [1].
 
+![screenshot](https://github.com/Lokno/ColorPicker/raw/master/doc/screenshot.png)
+
 ## Usage ##
 
 Open this link: https://lokno.github.io/ColorPicker/
