@@ -4,7 +4,9 @@ Experimental color picker which finds a gradient through the CIE XYZ color space
 
 ## Usage ##
 
-View picker.html in a web browser. Select a type of color-blindness using the drop-down menu below the color space:
+Open this link: https://lokno.github.io/ColorPicker/
+
+Select a type of color-blindness using the drop-down menu below the color space:
 
 - (Protan) protanopia (red-blindness)
 - (Deutan) deuteranopia (green-blindness)
