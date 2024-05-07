@@ -22,7 +22,8 @@ The ring of dots represent the 15 colors from the D-15 color test. Notice how th
 
 ## Testing ##
 
-- Tested with Google Chrome version 37.0.2062.120 m
+- Tested with Firfox 125.0.3 (64-bit)
+- Tested with Google Chrome Version 124.0.6367.156 (64-bit)
 
 ## Issues ##
 
